@@ -1,16 +1,238 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tetris</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Tetris Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #202020;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            grid-template-rows: repeat(20, 30px);
+            border: 2px solid #ffffff;
+        }
+
+        .cell {
+            background-color: #000000;
+            border: 1px solid #ffffff;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Tetris</h1>
-        <div id="grid"></div>
-        <div class="score">Score: <span id="score">0</span></div>
-        <button id="start-button">Start</button>
-    </div>
-    <script src="script.js"></script>
+    <div class="grid" id="grid"></div>
+
+    <script>
+        // Constants
+        const gridWidth = 10;
+        const gridHeight = 20;
+        const emptyCell = "";
+
+        // Variables
+        let gridCells = [];
+        let grid = [];
+        let currentTetromino = [];
+        let currentTetrominoColor = "";
+        let currentTetrominoRow = -1;
+        let currentTetrominoCol = Math.floor(gridWidth / 2);
+        let timerId;
+
+        // Tetromino shapes and colors
+        const tetrominos = [
+            [[1, 1, 1, 1]],
+            [[1, 1], [1, 1]],
+            [[1, 1, 0], [0, 1, 1]],
+            [[0, 1, 1], [1, 1, 0]],
+            [[1, 1, 1], [0, 1, 0]],
+            [[1, 1, 1], [1, 0, 0]],
+            [[1, 1, 1], [0, 0, 1]]
+        ];
+
+        const tetrominoColors = [
+            "#FF0000",
+            "#00FF00",
+            "#0000FF",
+            "#FFFF00",
+            "#FF00FF",
+            "#00FFFF",
+            "#FFFFFF"
+        ];
+
+        // Create the game grid
+        function createGrid() {
+            const grid = document.getElementById("grid");
+            for (let i = 0; i < gridHeight; i++) {
+                const row = [];
+                for (let j = 0; j < gridWidth; j++) {
+                    const cell = document.createElement("div");
+                    cell.classList.add("cell");
+                    row.push(cell);
+                    grid.appendChild(cell);
+                }
+                gridCells.push(row);
+            }
+        }
+
+        // Draw the game grid
+        function drawGrid() {
+            for (let i = 0; i < gridHeight; i++) {
+                for (let j = 0; j < gridWidth; j++) {
+                    const cell = gridCells[i][j];
+                    cell.style.backgroundColor = grid[i][j] || emptyCell;
+                }
+            }
+        }
+
+        // Initialize the game grid
+        function initGrid() {
+            for (let i = 0; i < gridHeight; i++) {
+                const row = Array(gridWidth).fill(emptyCell);
+                grid.push(row);
+            }
+        }
+
+        // Generate a random tetromino
+        function getRandomTetromino() {
+            const randomIndex = Math.floor(Math.random() * tetrominos.length);
+            return tetrominos[randomIndex];
+        }
+
+        // Generate a random tetromino color
+        function getRandomTetrominoColor() {
+            const randomIndex = Math.floor(Math.random() * tetrominoColors.length);
+            return tetrominoColors[randomIndex];
+        }
+
+        // Start the game
+        function startGame() {
+            gridCells = [];
+            grid = [];
+            drawGrid();
+            currentTetromino = getRandomTetromino();
+            currentTetrominoColor = getRandomTetrominoColor();
+            currentTetrominoRow = -1;
+            currentTetrominoCol = Math.floor(gridWidth / 2);
+            timerId = setInterval(update, 1000);
+        }
+
+        // Update the game state
+        function update() {
+            if (!moveTetromino(1, 0)) {
+                mergeTetromino();
+                clearRows();
+                currentTetromino = getRandomTetromino();
+                currentTetrominoColor = getRandomTetrominoColor();
+                currentTetrominoRow = -1;
+                currentTetrominoCol = Math.floor(gridWidth / 2);
+                if (!moveTetromino(1, 0)) {
+                    gameOver();
+                }
+            }
+            drawGrid();
+        }
+
+        // Move the current tetromino
+        function moveTetromino(rowOffset, colOffset) {
+            const newTetrominoRow = currentTetrominoRow + rowOffset;
+            const newTetrominoCol = currentTetrominoCol + colOffset;
+
+            if (!isCollision(newTetrominoRow, newTetrominoCol, currentTetromino)) {
+                currentTetrominoRow = newTetrominoRow;
+                currentTetrominoCol = newTetrominoCol;
+                return true;
+            }
+
+            return false;
+        }
+
+        // Rotate the current tetromino
+        function rotateTetromino() {
+            const rotatedTetromino = currentTetromino[0].map((_, i) =>
+                currentTetromino.map(row => row[i]).reverse()
+            );
+
+            if (!isCollision(currentTetrominoRow, currentTetrominoCol, rotatedTetromino)) {
+                currentTetromino = rotatedTetromino;
+            }
+        }
+
+        // Check if there is a collision with the grid or other tetrominos
+        function isCollision(row, col, tetromino) {
+            for (let i = 0; i < tetromino.length; i++) {
+                for (let j = 0; j < tetromino[i].length; j++) {
+                    if (
+                        tetromino[i][j] &&
+                        (row + i >= gridHeight ||
+                            col + j < 0 ||
+                            col + j >= gridWidth ||
+                            grid[row + i][col + j] !== emptyCell)
+                    ) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // Merge the current tetromino into the grid
+        function mergeTetromino() {
+            for (let i = 0; i < currentTetromino.length; i++) {
+                for (let j = 0; j < currentTetromino[i].length; j++) {
+                    if (currentTetromino[i][j]) {
+                        grid[currentTetrominoRow + i][currentTetrominoCol + j] =
+                            currentTetrominoColor;
+                    }
+                }
+            }
+        }
+
+        // Clear completed rows
+        function clearRows() {
+            let rowsCleared = 0;
+            for (let i = gridHeight - 1; i >= 0; i--) {
+                if (grid[i].every(cell => cell !== emptyCell)) {
+                    grid.splice(i, 1);
+                    grid.unshift(Array(gridWidth).fill(emptyCell));
+                    rowsCleared++;
+                }
+            }
+            return rowsCleared;
+        }
+
+        // Game over
+        function gameOver() {
+            clearInterval(timerId);
+            alert("Game Over");
+        }
+
+        // Handle key events
+        document.addEventListener("keydown", function (event) {
+            switch (event.keyCode) {
+                case 37: // Left Arrow
+                    moveTetromino(0, -1);
+                    break;
+                case 39: // Right Arrow
+                    moveTetromino(0, 1);
+                    break;
+                case 40: // Down Arrow
+                    moveTetromino(1, 0);
+                    break;
+                case 38: // Up Arrow
+                    rotateTetromino();
+                    break;
+            }
+            drawGrid();
+        });
+
+        // Start the game
+        createGrid();
+        initGrid();
+        startGame();
+    </script>
 </body>
 </html>
