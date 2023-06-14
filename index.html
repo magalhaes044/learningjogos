@@ -1,180 +1,201 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Jogo da Memória</title>
+    <title>Space Invaders</title>
     <style>
-        .memory-card {
-            width: 150px;
-            height: 150px;
-            background-color: #f2f2f2;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 10px;
-            margin: 10px;
-            cursor: pointer;
-            font-size: 0;
-            perspective: 1000px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .memory-card.flipped {
-            transform: rotateY(180deg);
-        }
-
-        .memory-card .card-front,
-        .memory-card .card-back {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: absolute;
-            backface-visibility: hidden;
-        }
-
-        .memory-card .card-front {
-            transform: rotateY(180deg);
-        }
-
-        .memory-card .card-back img {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
-        .board {
-            display: flex;
-            flex-wrap: wrap;
-            width: 620px;
+        #game-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
             margin: 0 auto;
-            margin-top: 50px;
-            perspective: 1200px;
+            border: 1px solid #000;
         }
 
-        .message {
+        .player {
+            position: absolute;
+            bottom: 10px;
+            left: 175px;
+            width: 50px;
+            height: 50px;
+            background-color: red;
+        }
+
+        .bullet {
+            position: absolute;
+            background-color: yellow;
+            width: 5px;
+            height: 10px;
+        }
+
+        .enemy {
+            position: absolute;
+            background-color: green;
+            width: 40px;
+            height: 40px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #score {
             text-align: center;
+            font-size: 24px;
             margin-top: 20px;
+        }
+
+        #message {
+            text-align: center;
+            font-size: 36px;
+            margin-top: 50px;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="board" id="board"></div>
-    <div class="message" id="message"></div>
+    <div id="game-container">
+        <div class="player"></div>
+        <div id="bullet"></div>
+        <div id="enemies-container"></div>
+    </div>
+    <div id="score">Score: <span id="score-value">0</span></div>
+    <div id="message"></div>
 
     <script>
-        const cardsData = [
-            { id: 1, imgSrc: "https://th.bing.com/th/id/R.dc0fdc7115fc970721be68b32a795ddf?rik=cjrVpbqHo5oXkQ&pid=ImgRaw&r=0" },
-            { id: 2, imgSrc: "https://th.bing.com/th/id/R.dc0fdc7115fc970721be68b32a795ddf?rik=cjrVpbqHo5oXkQ&pid=ImgRaw&r=0" },
-            { id: 3, imgSrc: "https://wallpapercave.com/wp/wp7515420.jpg" },
-            { id: 4, imgSrc: "https://wallpapercave.com/wp/wp7515420.jpg" },
-            { id: 5, imgSrc: "https://th.bing.com/th/id/R.dfc6c959b6fc26222c4c823640cd740f?rik=k0xTsLz%2bcRWxrA&pid=ImgRaw&r=0" },
-            { id: 6, imgSrc: "https://th.bing.com/th/id/R.dfc6c959b6fc26222c4c823640cd740f?rik=k0xTsLz%2bcRWxrA&pid=ImgRaw&r=0" },
-            { id: 7, imgSrc: "https://th.bing.com/th/id/R.49aa03f2df7e6d21a9e868fc99f1a596?rik=UpoPL1OP9WJeeA&pid=ImgRaw&r=0" },
-            { id: 8, imgSrc: "https://th.bing.com/th/id/R.49aa03f2df7e6d21a9e868fc99f1a596?rik=UpoPL1OP9WJeeA&pid=ImgRaw&r=0" },
-            { id: 9, imgSrc: "https://th.bing.com/th/id/OIP.M03JhfVi5VdwALFVo_EBpAHaHY?pid=ImgDet&rs=1" },
-            { id: 10, imgSrc: "https://th.bing.com/th/id/OIP.M03JhfVi5VdwALFVo_EBpAHaHY?pid=ImgDet&rs=1" },
-            { id: 11, imgSrc: "https://th.bing.com/th/id/R.6e90c1493cc7b8d644edf5ec5bbfb818?rik=%2bkOLkjQIM8Lv9Q&pid=ImgRaw&r=0" },
-            { id: 12, imgSrc: "https://th.bing.com/th/id/R.6e90c1493cc7b8d644edf5ec5bbfb818?rik=%2bkOLkjQIM8Lv9Q&pid=ImgRaw&r=0" },
-            { id: 13, imgSrc: "https://th.bing.com/th/id/R.67a4303f45b6ea2b4230e6293c7e1af6?rik=PwcdKcJN7sxbKg&pid=ImgRaw&r=0" },
-            { id: 14, imgSrc: "https://th.bing.com/th/id/R.67a4303f45b6ea2b4230e6293c7e1af6?rik=PwcdKcJN7sxbKg&pid=ImgRaw&r=0" },
-            { id: 15, imgSrc: "https://th.bing.com/th/id/OIP.cl40FTVkiLgVoifTFs2GlAHaEK?pid=ImgDet&rs=1" },
-            { id: 16, imgSrc: "https://th.bing.com/th/id/OIP.cl40FTVkiLgVoifTFs2GlAHaEK?pid=ImgDet&rs=1" },
-        ];
+        // Game variables
+        let player;
+        let bullet;
+        let enemiesContainer;
+        let scoreValue;
+        let message;
+        let score;
+        let gameRunning;
 
-        const board = document.getElementById("board");
-        const message = document.getElementById("message");
+        // Initialize the game
+        function initGame() {
+            player = document.querySelector(".player");
+            bullet = document.getElementById("bullet");
+            enemiesContainer = document.getElementById("enemies-container");
+            scoreValue = document.getElementById("score-value");
+            message = document.getElementById("message");
+            score = 0;
+            gameRunning = true;
 
-        let flippedCards = [];
-        let matchedCards = [];
+            createEnemies();
 
-        // Shuffle the cards
-        function shuffleCards() {
-            for (let i = cardsData.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [cardsData[i], cardsData[j]] = [cardsData[j], cardsData[i]];
-            }
+            document.addEventListener("keydown", handleKeyDown);
+            requestAnimationFrame(update);
         }
 
-        // Create the memory cards
-        function createMemoryCards() {
-            shuffleCards();
-            for (let i = 0; i < cardsData.length; i++) {
-                const card = document.createElement("div");
-                card.className = "memory-card";
-                card.dataset.id = cardsData[i].id;
-
-                const front = document.createElement("div");
-                front.className = "card-front";
-
-                const back = document.createElement("div");
-                back.className = "card-back";
-                const img = document.createElement("img");
-                img.src = cardsData[i].imgSrc;
-                back.appendChild(img);
-
-                card.appendChild(front);
-                card.appendChild(back);
-
-                card.addEventListener("click", flipCard);
-
-                board.appendChild(card);
-            }
-        }
-
-        // Flip a card
-        function flipCard() {
-            if (
-                this.classList.contains("flipped") ||
-                flippedCards.length >= 2 ||
-                matchedCards.includes(this)
-            ) {
-                return;
-            }
-
-            this.classList.add("flipped");
-            flippedCards.push(this);
-
-            if (flippedCards.length === 2) {
-                checkMatch();
-            }
-        }
-
-        // Check if the flipped cards match
-        function checkMatch() {
-            const card1 = flippedCards[0];
-            const card2 = flippedCards[1];
-
-            const id1 = card1.dataset.id;
-            const id2 = card2.dataset.id;
-
-            if (id1 === id2) {
-                card1.removeEventListener("click", flipCard);
-                card2.removeEventListener("click", flipCard);
-
-                matchedCards.push(card1);
-                matchedCards.push(card2);
-
-                if (matchedCards.length === cardsData.length) {
-                    showWinMessage();
+        // Create the enemies
+        function createEnemies() {
+            for (let i = 0; i < 5; i++) {
+                const row = document.createElement("div");
+                row.className = "row";
+                for (let j = 0; j < 10; j++) {
+                    const enemy = document.createElement("div");
+                    enemy.className = "enemy";
+                    row.appendChild(enemy);
                 }
-            } else {
-                setTimeout(() => {
-                    card1.classList.remove("flipped");
-                    card2.classList.remove("flipped");
-                }, 1000);
+                enemiesContainer.appendChild(row);
             }
-
-            flippedCards = [];
         }
 
-        // Show win message
-        function showWinMessage() {
-            message.innerText = "Parabéns! Você venceu o jogo!";
+        // Handle key down events
+        function handleKeyDown(event) {
+            if (event.keyCode === 32) {
+                shoot();
+            } else if (event.keyCode === 37) {
+                movePlayer(-10);
+            } else if (event.keyCode === 39) {
+                movePlayer(10);
+            }
+        }
+
+        // Move the player
+        function movePlayer(delta) {
+            const currentPosition = parseInt(player.style.left) || 0;
+            const newPosition = currentPosition + delta;
+            if (newPosition >= 0 && newPosition <= 350) {
+                player.style.left = newPosition + "px";
+            }
+        }
+
+        // Shoot a bullet
+        function shoot() {
+            if (!bullet.parentElement) {
+                const playerPosition = player.getBoundingClientRect();
+                bullet.style.left = (playerPosition.left + 22) + "px";
+                bullet.style.bottom = "60px";
+                bullet.style.display = "block";
+                animateBullet();
+            }
+        }
+
+        // Animate the bullet
+        function animateBullet() {
+            const bulletPosition = parseInt(bullet.style.bottom) || 0;
+            const newBulletPosition = bulletPosition + 10;
+            bullet.style.bottom = newBulletPosition + "px";
+
+            if (newBulletPosition < 400 && gameRunning) {
+                requestAnimationFrame(animateBullet);
+            } else {
+                bullet.style.display = "none";
+            }
+
+            checkCollision();
+        }
+
+        // Check collision between bullet and enemies
+        function checkCollision() {
+            const bulletRect = bullet.getBoundingClientRect();
+            const enemyRects = enemiesContainer.getElementsByClassName("enemy");
+            for (let i = 0; i < enemyRects.length; i++) {
+                const enemyRect = enemyRects[i].getBoundingClientRect();
+                if (
+                    bulletRect.left <= enemyRect.right &&
+                    bulletRect.right >= enemyRect.left &&
+                    bulletRect.top <= enemyRect.bottom &&
+                    bulletRect.bottom >= enemyRect.top
+                ) {
+                    enemiesContainer.removeChild(enemyRects[i]);
+                    score++;
+                    scoreValue.innerText = score;
+                }
+            }
+
+            if (enemiesContainer.children.length === 0) {
+                gameRunning = false;
+                message.innerText = "Parabéns, você venceu!";
+                message.style.display = "block";
+            }
+        }
+
+        // Update the game state
+        function update() {
+            if (gameRunning) {
+                checkGameOver();
+                requestAnimationFrame(update);
+            }
+        }
+
+        // Check if the game is over
+        function checkGameOver() {
+            const enemyRects = enemiesContainer.getElementsByClassName("enemy");
+            for (let i = 0; i < enemyRects.length; i++) {
+                const enemyRect = enemyRects[i].getBoundingClientRect();
+                if (enemyRect.bottom >= 380) {
+                    gameRunning = false;
+                    message.innerText = "Game over!";
+                    message.style.display = "block";
+                }
+            }
         }
 
         // Start the game
-        createMemoryCards();
+        initGame();
     </script>
 </body>
 </html>
