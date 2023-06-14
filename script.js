@@ -3,6 +3,7 @@ var currentShape;
 var currentShapeCoords;
 var interval;
 var score = 0;
+var isGameRunning = false;
 
 function createGrid() {
   for (var row = 0; row < 20; row++) {
@@ -73,11 +74,13 @@ function removeShape() {
 function isCollision() {
   for (var row = 0; row < currentShape.length; row++) {
     for (var col = 0; col < currentShape[row].length; col++) {
-      if (currentShape[row][col] &&
-          (currentShapeCoords.y + row >= 20 ||
+      if (
+        currentShape[row][col] &&
+        (currentShapeCoords.y + row >= 20 ||
           currentShapeCoords.x + col < 0 ||
           currentShapeCoords.x + col >= 10 ||
-          grid[currentShapeCoords.y + row][currentShapeCoords.x + col])) {
+          grid[currentShapeCoords.y + row][currentShapeCoords.x + col])
+      ) {
         return true;
       }
     }
@@ -98,7 +101,7 @@ function mergeShape() {
 
 function checkRows() {
   for (var row = 19; row >= 0; row--) {
-    if (grid[row].every(cell => cell)) {
+    if (grid[row].every((cell) => cell)) {
       score++;
       grid.splice(row, 1);
       grid.unshift(new Array(10).fill(0));
@@ -107,7 +110,7 @@ function checkRows() {
 }
 
 function updateScore() {
-  document.getElementById('score').innerHTML = score;
+  document.getElementById('score').innerHTML = 'Score: ' + score;
 }
 
 function moveDown() {
@@ -121,6 +124,7 @@ function moveDown() {
 
     if (isCollision()) {
       clearInterval(interval);
+      isGameRunning = false;
       alert('Game Over!');
       return;
     }
@@ -172,27 +176,34 @@ function rotateShape() {
   drawShape();
 }
 
-document.addEventListener('keydown', function(event) {
-  switch (event.key) {
-    case 'ArrowDown':
-      moveDown();
-      break;
-    case 'ArrowLeft':
-      moveLeft();
-      break;
-    case 'ArrowRight':
-      moveRight();
-      break;
-    case 'ArrowUp':
-      rotateShape();
-      break;
+document.addEventListener('keydown', function (event) {
+  if (isGameRunning) {
+    switch (event.key) {
+      case 'ArrowDown':
+        moveDown();
+        break;
+      case 'ArrowLeft':
+        moveLeft();
+        break;
+      case 'ArrowRight':
+        moveRight();
+        break;
+      case 'ArrowUp':
+        rotateShape();
+        break;
+    }
   }
 });
 
-createGrid();
-createShape();
-drawGrid();
-drawShape();
-updateScore();
-
-interval = setInterval(moveDown, 500);
+document.getElementById('start-button').addEventListener('click', function () {
+  if (!isGameRunning) {
+    isGameRunning = true;
+    score = 0;
+    createGrid();
+    drawGrid();
+    createShape();
+    drawShape();
+    updateScore();
+    interval = setInterval(moveDown, 500);
+  }
+});
