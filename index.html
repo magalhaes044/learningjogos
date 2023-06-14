@@ -1,12 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Jogo da Cobrinha</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
-</head>
-<body>
-  <canvas id="game-canvas"></canvas>
+  <meta charset="UTF-8">
+    <title>Site de Pastel</title>
+      <link rel="stylesheet" type="text/css" href="style.css">
+        <script src="script.js"></script>
+        </head>
+        <body>
+          <header>
+              <nav>
+                    <ul>
+                            <li><a href="#home">Home</a></li>
+                                    <li><a href="#cardapio">Cardápio</a></li>
+                                            <li><a href="#sobre">Sobre</a></li>
+                                                    <li><a href="#contato">Contato</a></li>
+                                                          </ul>
+                                                              </nav>
+                                                                </header>
 
-  <script src="script.js"></script>
-</body>
-</html>
+                                                                  <section id="home">
+                                                                      <div class="overlay">
+                                                                            <h1>Bem-vindo ao Pastel da Japa</h1>
+                                                                                </div>
+                                                                                  </section>
+
+                                                                                    <section id="cardapio">
+                                                                                        <h2>Cardápio</h2>
+                                                                                            <div class="menu-item">
+                                                                                                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR25YAzeD_EiYoasRxGS5zwpq3VlFKRgKbCSg&usqp=CAU" alt="Pastel de Queijo">
+                                                                                                        <h3>Pastel de Queijo</h3>
+                                                                                                              <p>Delicioso pastel recheado com queijo derretido.</p>
+                                                                                                                  </div>
+                                                                                                                      <div class="menu-item">
+                                                                                                                            <img src="pastel2.jpg" alt="Pastel de Carne">
+                                                                                                                                  <h3>Pastel de Carne</h3>
+                                                                                                                                        <p>Suculento pastel recheado com carne moída temperada.</p>
+                                                                                                                                            </div>
+                                                                                                                                                <!-- Adicione mais itens de cardápio aqui -->
+                                                                                                                                                  </section>
+
+                                                                                                                                                    <section id="sobre">
+                                                                                                                                                        <h2>Sobre</h2>
+                                                                                                                                                            <p>Um pouco sobre a história e qualidade dos nossos pasteis.</p>
+                                                                                                                                                              </section>
+
+                                                                                                                                                                <section id="contato">
+                                                                                                                                                                    <h2>Contato</h2>
+                                                                                                                                                                        <form>
+                                                                                                                                                                              <label for="nome">Nome:</label>
+                                                                                                                                                                                    <input type="text" id="nome" name="nome" required>
+                                                                                                                                                                                          <label for="email">E-mail:</label>
+                                                                                                                                                                                                <input type="email" id="email" name="email" required>
+                                                                                                                                                                                                      <label for="mensagem">Mensagem:</label>
+                                                                                                                                                                                                            <textarea id="mensagem" name="mensagem" required></textarea>
+                                                                                                                                                                                                                  <button type="submit">Enviar</button>
+                                                                                                                                                                                                                      </form>
+                                                                                                                                                                                                                        </section>
+
+                                                                                                                                                                                                                          <footer>
+                                                                                                                                                                                                                              <p>&copy; 2023 Site de Pastel. Todos os direitos reservados.</p>
+                                                                                                                                                                                                                                </footer>
+                                                                                                                                                                                                                                </body>
+                                                                                                                                                                                                                                </html>
