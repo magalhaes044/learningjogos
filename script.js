@@ -1,37 +1,55 @@
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'ArrowUp') {
-      movePlayer('up');
-    } else if (event.key === 'ArrowDown') {
-      movePlayer('down');
-    } else if (event.key === 'ArrowLeft') {
-      movePlayer('left');
-    } else if (event.key === 'ArrowRight') {
-      movePlayer('right');
-    }
-  });
-  
-  function movePlayer(direction) {
-    var player = document.getElementById('player');
-    var playerPosition = player.getBoundingClientRect();
-  
-    var gameContainer = document.getElementById('game-container');
-    var gameContainerPosition = gameContainer.getBoundingClientRect();
-  
-    var newPosition = {
-      x: playerPosition.left,
-      y: playerPosition.top
-    };
-  
-    if (direction === 'up' && playerPosition.top > gameContainerPosition.top) {
-      newPosition.y -= 10;
-    } else if (direction === 'down' && playerPosition.bottom < gameContainerPosition.bottom) {
-      newPosition.y += 10;
-    } else if (direction === 'left' && playerPosition.left > gameContainerPosition.left) {
-      newPosition.x -= 10;
-    } else if (direction === 'right' && playerPosition.right < gameContainerPosition.right) {
-      newPosition.x += 10;
-    }
-  
-    player.style.left = newPosition.x + 'px';
-    player.style.top = newPosition.y + 'px';
+var cards = document.querySelectorAll('.card');
+var hasFlippedCard = false;
+var lockBoard = false;
+var firstCard, secondCard;
+
+cards.forEach(function(card) {
+  card.addEventListener('click', flipCard);
+});
+
+function flipCard() {
+  if (lockBoard) return;
+  if (this === firstCard) return;
+
+  this.classList.add('hidden');
+
+  if (!hasFlippedCard) {
+    hasFlippedCard = true;
+    firstCard = this;
+    return;
   }
+
+  secondCard = this;
+  checkForMatch();
+}
+
+function checkForMatch() {
+  var isMatch = firstCard.classList[1] === secondCard.classList[1];
+  isMatch ? disableCards() : unflipCards();
+}
+
+function disableCards() {
+  firstCard.removeEventListener('click', flipCard);
+  secondCard.removeEventListener('click', flipCard);
+
+  firstCard.classList.add('matched');
+  secondCard.classList.add('matched');
+
+  resetBoard();
+}
+
+function unflipCards() {
+  lockBoard = true;
+
+  setTimeout(function() {
+    firstCard.classList.remove('hidden');
+    secondCard.classList.remove('hidden');
+
+    resetBoard();
+  }, 1000);
+}
+
+function resetBoard() {
+  [hasFlippedCard, lockBoard] = [false, false];
+  [firstCard, secondCard] = [null, null];
+}
