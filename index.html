@@ -1,238 +1,180 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tetris Game</title>
+    <title>Jogo da Memória</title>
     <style>
-        body {
+        .memory-card {
+            width: 150px;
+            height: 150px;
+            background-color: #f2f2f2;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #202020;
+            border-radius: 10px;
+            margin: 10px;
+            cursor: pointer;
+            font-size: 0;
+            perspective: 1000px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(10, 30px);
-            grid-template-rows: repeat(20, 30px);
-            border: 2px solid #ffffff;
+        .memory-card.flipped {
+            transform: rotateY(180deg);
         }
 
-        .cell {
-            background-color: #000000;
-            border: 1px solid #ffffff;
+        .memory-card .card-front,
+        .memory-card .card-back {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            backface-visibility: hidden;
+        }
+
+        .memory-card .card-front {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card .card-back img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .board {
+            display: flex;
+            flex-wrap: wrap;
+            width: 620px;
+            margin: 0 auto;
+            margin-top: 50px;
+            perspective: 1200px;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="grid" id="grid"></div>
+    <div class="board" id="board"></div>
+    <div class="message" id="message"></div>
 
     <script>
-        // Constants
-        const gridWidth = 10;
-        const gridHeight = 20;
-        const emptyCell = "";
-
-        // Variables
-        let gridCells = [];
-        let grid = [];
-        let currentTetromino = [];
-        let currentTetrominoColor = "";
-        let currentTetrominoRow = -1;
-        let currentTetrominoCol = Math.floor(gridWidth / 2);
-        let timerId;
-
-        // Tetromino shapes and colors
-        const tetrominos = [
-            [[1, 1, 1, 1]],
-            [[1, 1], [1, 1]],
-            [[1, 1, 0], [0, 1, 1]],
-            [[0, 1, 1], [1, 1, 0]],
-            [[1, 1, 1], [0, 1, 0]],
-            [[1, 1, 1], [1, 0, 0]],
-            [[1, 1, 1], [0, 0, 1]]
+        const cardsData = [
+            { id: 1, imgSrc: "https://th.bing.com/th/id/R.dc0fdc7115fc970721be68b32a795ddf?rik=cjrVpbqHo5oXkQ&pid=ImgRaw&r=0" },
+            { id: 2, imgSrc: "https://th.bing.com/th/id/R.dc0fdc7115fc970721be68b32a795ddf?rik=cjrVpbqHo5oXkQ&pid=ImgRaw&r=0" },
+            { id: 3, imgSrc: "https://wallpapercave.com/wp/wp7515420.jpg" },
+            { id: 4, imgSrc: "https://wallpapercave.com/wp/wp7515420.jpg" },
+            { id: 5, imgSrc: "https://th.bing.com/th/id/R.dfc6c959b6fc26222c4c823640cd740f?rik=k0xTsLz%2bcRWxrA&pid=ImgRaw&r=0" },
+            { id: 6, imgSrc: "https://th.bing.com/th/id/R.dfc6c959b6fc26222c4c823640cd740f?rik=k0xTsLz%2bcRWxrA&pid=ImgRaw&r=0" },
+            { id: 7, imgSrc: "https://th.bing.com/th/id/R.49aa03f2df7e6d21a9e868fc99f1a596?rik=UpoPL1OP9WJeeA&pid=ImgRaw&r=0" },
+            { id: 8, imgSrc: "https://th.bing.com/th/id/R.49aa03f2df7e6d21a9e868fc99f1a596?rik=UpoPL1OP9WJeeA&pid=ImgRaw&r=0" },
+            { id: 9, imgSrc: "https://th.bing.com/th/id/OIP.M03JhfVi5VdwALFVo_EBpAHaHY?pid=ImgDet&rs=1" },
+            { id: 10, imgSrc: "https://th.bing.com/th/id/OIP.M03JhfVi5VdwALFVo_EBpAHaHY?pid=ImgDet&rs=1" },
+            { id: 11, imgSrc: "https://th.bing.com/th/id/R.6e90c1493cc7b8d644edf5ec5bbfb818?rik=%2bkOLkjQIM8Lv9Q&pid=ImgRaw&r=0" },
+            { id: 12, imgSrc: "https://th.bing.com/th/id/R.6e90c1493cc7b8d644edf5ec5bbfb818?rik=%2bkOLkjQIM8Lv9Q&pid=ImgRaw&r=0" },
+            { id: 13, imgSrc: "https://th.bing.com/th/id/R.67a4303f45b6ea2b4230e6293c7e1af6?rik=PwcdKcJN7sxbKg&pid=ImgRaw&r=0" },
+            { id: 14, imgSrc: "https://th.bing.com/th/id/R.67a4303f45b6ea2b4230e6293c7e1af6?rik=PwcdKcJN7sxbKg&pid=ImgRaw&r=0" },
+            { id: 15, imgSrc: "https://th.bing.com/th/id/OIP.cl40FTVkiLgVoifTFs2GlAHaEK?pid=ImgDet&rs=1" },
+            { id: 16, imgSrc: "https://th.bing.com/th/id/OIP.cl40FTVkiLgVoifTFs2GlAHaEK?pid=ImgDet&rs=1" },
         ];
 
-        const tetrominoColors = [
-            "#FF0000",
-            "#00FF00",
-            "#0000FF",
-            "#FFFF00",
-            "#FF00FF",
-            "#00FFFF",
-            "#FFFFFF"
-        ];
+        const board = document.getElementById("board");
+        const message = document.getElementById("message");
 
-        // Create the game grid
-        function createGrid() {
-            const grid = document.getElementById("grid");
-            for (let i = 0; i < gridHeight; i++) {
-                const row = [];
-                for (let j = 0; j < gridWidth; j++) {
-                    const cell = document.createElement("div");
-                    cell.classList.add("cell");
-                    row.push(cell);
-                    grid.appendChild(cell);
+        let flippedCards = [];
+        let matchedCards = [];
+
+        // Shuffle the cards
+        function shuffleCards() {
+            for (let i = cardsData.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cardsData[i], cardsData[j]] = [cardsData[j], cardsData[i]];
+            }
+        }
+
+        // Create the memory cards
+        function createMemoryCards() {
+            shuffleCards();
+            for (let i = 0; i < cardsData.length; i++) {
+                const card = document.createElement("div");
+                card.className = "memory-card";
+                card.dataset.id = cardsData[i].id;
+
+                const front = document.createElement("div");
+                front.className = "card-front";
+
+                const back = document.createElement("div");
+                back.className = "card-back";
+                const img = document.createElement("img");
+                img.src = cardsData[i].imgSrc;
+                back.appendChild(img);
+
+                card.appendChild(front);
+                card.appendChild(back);
+
+                card.addEventListener("click", flipCard);
+
+                board.appendChild(card);
+            }
+        }
+
+        // Flip a card
+        function flipCard() {
+            if (
+                this.classList.contains("flipped") ||
+                flippedCards.length >= 2 ||
+                matchedCards.includes(this)
+            ) {
+                return;
+            }
+
+            this.classList.add("flipped");
+            flippedCards.push(this);
+
+            if (flippedCards.length === 2) {
+                checkMatch();
+            }
+        }
+
+        // Check if the flipped cards match
+        function checkMatch() {
+            const card1 = flippedCards[0];
+            const card2 = flippedCards[1];
+
+            const id1 = card1.dataset.id;
+            const id2 = card2.dataset.id;
+
+            if (id1 === id2) {
+                card1.removeEventListener("click", flipCard);
+                card2.removeEventListener("click", flipCard);
+
+                matchedCards.push(card1);
+                matchedCards.push(card2);
+
+                if (matchedCards.length === cardsData.length) {
+                    showWinMessage();
                 }
-                gridCells.push(row);
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove("flipped");
+                    card2.classList.remove("flipped");
+                }, 1000);
             }
+
+            flippedCards = [];
         }
 
-        // Draw the game grid
-        function drawGrid() {
-            for (let i = 0; i < gridHeight; i++) {
-                for (let j = 0; j < gridWidth; j++) {
-                    const cell = gridCells[i][j];
-                    cell.style.backgroundColor = grid[i][j] || emptyCell;
-                }
-            }
-        }
-
-        // Initialize the game grid
-        function initGrid() {
-            for (let i = 0; i < gridHeight; i++) {
-                const row = Array(gridWidth).fill(emptyCell);
-                grid.push(row);
-            }
-        }
-
-        // Generate a random tetromino
-        function getRandomTetromino() {
-            const randomIndex = Math.floor(Math.random() * tetrominos.length);
-            return tetrominos[randomIndex];
-        }
-
-        // Generate a random tetromino color
-        function getRandomTetrominoColor() {
-            const randomIndex = Math.floor(Math.random() * tetrominoColors.length);
-            return tetrominoColors[randomIndex];
+        // Show win message
+        function showWinMessage() {
+            message.innerText = "Parabéns! Você venceu o jogo!";
         }
 
         // Start the game
-        function startGame() {
-            gridCells = [];
-            grid = [];
-            drawGrid();
-            currentTetromino = getRandomTetromino();
-            currentTetrominoColor = getRandomTetrominoColor();
-            currentTetrominoRow = -1;
-            currentTetrominoCol = Math.floor(gridWidth / 2);
-            timerId = setInterval(update, 1000);
-        }
-
-        // Update the game state
-        function update() {
-            if (!moveTetromino(1, 0)) {
-                mergeTetromino();
-                clearRows();
-                currentTetromino = getRandomTetromino();
-                currentTetrominoColor = getRandomTetrominoColor();
-                currentTetrominoRow = -1;
-                currentTetrominoCol = Math.floor(gridWidth / 2);
-                if (!moveTetromino(1, 0)) {
-                    gameOver();
-                }
-            }
-            drawGrid();
-        }
-
-        // Move the current tetromino
-        function moveTetromino(rowOffset, colOffset) {
-            const newTetrominoRow = currentTetrominoRow + rowOffset;
-            const newTetrominoCol = currentTetrominoCol + colOffset;
-
-            if (!isCollision(newTetrominoRow, newTetrominoCol, currentTetromino)) {
-                currentTetrominoRow = newTetrominoRow;
-                currentTetrominoCol = newTetrominoCol;
-                return true;
-            }
-
-            return false;
-        }
-
-        // Rotate the current tetromino
-        function rotateTetromino() {
-            const rotatedTetromino = currentTetromino[0].map((_, i) =>
-                currentTetromino.map(row => row[i]).reverse()
-            );
-
-            if (!isCollision(currentTetrominoRow, currentTetrominoCol, rotatedTetromino)) {
-                currentTetromino = rotatedTetromino;
-            }
-        }
-
-        // Check if there is a collision with the grid or other tetrominos
-        function isCollision(row, col, tetromino) {
-            for (let i = 0; i < tetromino.length; i++) {
-                for (let j = 0; j < tetromino[i].length; j++) {
-                    if (
-                        tetromino[i][j] &&
-                        (row + i >= gridHeight ||
-                            col + j < 0 ||
-                            col + j >= gridWidth ||
-                            grid[row + i][col + j] !== emptyCell)
-                    ) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        // Merge the current tetromino into the grid
-        function mergeTetromino() {
-            for (let i = 0; i < currentTetromino.length; i++) {
-                for (let j = 0; j < currentTetromino[i].length; j++) {
-                    if (currentTetromino[i][j]) {
-                        grid[currentTetrominoRow + i][currentTetrominoCol + j] =
-                            currentTetrominoColor;
-                    }
-                }
-            }
-        }
-
-        // Clear completed rows
-        function clearRows() {
-            let rowsCleared = 0;
-            for (let i = gridHeight - 1; i >= 0; i--) {
-                if (grid[i].every(cell => cell !== emptyCell)) {
-                    grid.splice(i, 1);
-                    grid.unshift(Array(gridWidth).fill(emptyCell));
-                    rowsCleared++;
-                }
-            }
-            return rowsCleared;
-        }
-
-        // Game over
-        function gameOver() {
-            clearInterval(timerId);
-            alert("Game Over");
-        }
-
-        // Handle key events
-        document.addEventListener("keydown", function (event) {
-            switch (event.keyCode) {
-                case 37: // Left Arrow
-                    moveTetromino(0, -1);
-                    break;
-                case 39: // Right Arrow
-                    moveTetromino(0, 1);
-                    break;
-                case 40: // Down Arrow
-                    moveTetromino(1, 0);
-                    break;
-                case 38: // Up Arrow
-                    rotateTetromino();
-                    break;
-            }
-            drawGrid();
-        });
-
-        // Start the game
-        createGrid();
-        initGrid();
-        startGame();
+        createMemoryCards();
     </script>
 </body>
 </html>
