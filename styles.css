@@ -1,8 +1,71 @@
-body {
+/* Reset de Estilos */
+* {
     margin: 0;
-    overflow: hidden;
+    padding: 0;
+    box-sizing: border-box;
   }
   
-  canvas {
+  /* Estilos Globais */
+  body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+  }
+  
+  header {
+    background: #FFA500;
+    padding: 20px;
+  }
+  
+  nav ul {
+    list-style: none;
+  }
+  
+  nav ul li {
+    display: inline-block;
+    margin-right: 10px;
+  }
+  
+  nav ul li a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  section {
+    padding: 40px;
+  }
+  
+  h1, h2, h3 {
+    color: #FFA500;
+  }
+  
+  .menu-item {
+    margin-bottom: 20px;
+  }
+  
+  .menu-item img {
+    width: 200px;
+    height: auto;
+  }
+  
+  form input, form textarea {
     display: block;
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 10px;
+  }
+  
+  form button {
+    background: #FFA500;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  footer {
+    background: #FFA500;
+    padding: 20px;
+    text-align: center;
+    color: #fff;
   }  
