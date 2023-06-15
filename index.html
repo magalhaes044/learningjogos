@@ -1,77 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pastel da Japa</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-  <!-- Página inicial -->
   <header>
-    <h1>Pastel da Japa</h1>
     <nav>
       <ul>
-        <li><a href="#cardapio">Cardápio</a></li>
-        <li><a href="#pedidos">Faça seu pedido</a></li>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="cardapio.html">Cardápio</a></li>
+        <li><a href="pedido.html">Fazer Pedido</a></li>
       </ul>
     </nav>
   </header>
 
   <section id="banner">
-    <h2>Bem-vindo ao Pastel da Japa</h2>
-    <p>Os melhores pasteis da região, feitos com amor e tradição.</p>
+    <h1>Pastel da Japa</h1>
+    <p>Deliciosos pastéis para todos os gostos!</p>
   </section>
 
   <section id="cardapio">
-    <h2>Cardápio</h2>
     <div class="cardapio-item">
-      <img src="https://vejasp.abril.com.br/wp-content/uploads/2017/01/pastel_de_queijo_2___divulgacao.jpg" alt="Pastel de Queijo">
+      <img src="pasteis/pastel1.jpg" alt="Pastel de Queijo">
       <h3>Pastel de Queijo</h3>
-      <p>Delicioso pastel recheado com queijo derretido.</p>
-      <p class="preco">R$ 5,00</p>
-      <button class="adicionar-carrinho" data-nome="Pastel de Queijo" data-preco="5.00">Adicionar ao carrinho</button>
+      <p>Preço: R$ 5,00</p>
+      <button class="adicionar-carrinho" data-nome="Pastel de Queijo" data-preco="5.00">Adicionar ao Carrinho</button>
     </div>
     <div class="cardapio-item">
-      <img src="https://thumb-cdn.soluall.net/prod/shp_products/sp1280fw/9fe5a8d0-b70e-4a1c-a78d-f0e9bf1b2b72/d9f357ab-9789-40d0-843f-c112d8cbebf7.png" alt="Pastel de Carne">
+      <img src="pasteis/pastel2.jpg" alt="Pastel de Carne">
       <h3>Pastel de Carne</h3>
-      <p>Suculento pastel recheado com carne moída temperada.</p>
-      <p class="preco">R$ 6,00</p>
-      <button class="adicionar-carrinho" data-nome="Pastel de Carne" data-preco="6.00">Adicionar ao carrinho</button>
+      <p>Preço: R$ 6,00</p>
+      <button class="adicionar-carrinho" data-nome="Pastel de Carne" data-preco="6.00">Adicionar ao Carrinho</button>
     </div>
     <div class="cardapio-item">
-      <img src="https://thumb-cdn.soluall.net/prod/shp_products/sp1280fw/5f0c9ed4-f908-4c27-aae7-3e80ac1e0100/5f0c9ed4-b4d4-4488-875f-3e80ac1e0100.jpg" alt="Pastel de Frango">
+      <img src="pasteis/pastel3.jpg" alt="Pastel de Frango">
       <h3>Pastel de Frango</h3>
-      <p>Delicioso pastel recheado com frango desfiado e temperado.</p>
-      <p class="preco">R$ 5,50</p>
-      <button class="adicionar-carrinho" data-nome="Pastel de Frango" data-preco="5.50">Adicionar ao carrinho</button>
+      <p>Preço: R$ 5,50</p>
+      <button class="adicionar-carrinho" data-nome="Pastel de Frango" data-preco="5.50">Adicionar ao Carrinho</button>
     </div>
     <div class="cardapio-item">
-      <img src="https://th.bing.com/th/id/R.c25bb0908e203b03d96173202d55b9f1?rik=3FQD3J5KEJ1S7A&riu=http%3a%2f%2fwww.atoupeira.com.br%2fwp-content%2fuploads%2f2020%2f07%2fpastel-bangalo-de-palmito.jpg&ehk=qvG3ZpwZ0yCzzi855Vzj%2fuqDdJ9O4HMVfTjkmicvfHE%3d&risl=&pid=ImgRaw&r=0" alt="Pastel de Palmito">
+      <img src="pasteis/pastel4.jpg" alt="Pastel de Palmito">
       <h3>Pastel de Palmito</h3>
-      <p>Delicioso pastel recheado com palmito e temperos especiais.</p>
-      <p class="preco">R$ 6,50</p>
-      <button class="adicionar-carrinho" data-nome="Pastel de Palmito" data-preco="6.50">Adicionar ao carrinho</button>
+      <p>Preço: R$ 6,50</p>
+      <button class="adicionar-carrinho" data-nome="Pastel de Palmito" data-preco="6.50">Adicionar ao Carrinho</button>
     </div>
   </section>
 
-  <section id="pedidos">
-    <h2>Faça seu pedido</h2>
-    <form id="form-pedido">
-      <input type="text" id="nome" placeholder="Seu nome">
-      <input type="email" id="email" placeholder="Seu e-mail">
-      <button type="submit">Enviar Pedido</button>
-    </form>
+  <section id="carrinho">
+    <h2>Carrinho de Compras</h2>
+    <ul id="carrinho-lista"></ul>
+    <p id="carrinho-total">Total: R$ 0,00</p>
+    <button id="limpar-carrinho">Limpar Carrinho</button>
   </section>
 
   <footer>
     <p>&copy; 2023 Pastel da Japa. Todos os direitos reservados.</p>
   </footer>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="script.js"></script>
 </body>
-
 </html>

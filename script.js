@@ -1,48 +1,38 @@
 // script.js
-// Validação de formulário de pedido
-var formPedido = document.getElementById('form-pedido');
-formPedido.addEventListener('submit', function(event) {
-  event.preventDefault();
-  
-  var nome = document.getElementById('nome').value;
-  var email = document.getElementById('email').value;
 
-  if (nome.trim() === '' || email.trim() === '') {
-    alert('Por favor, preencha todos os campos do formulário de pedido.');
-    return;
-  }
+document.addEventListener('DOMContentLoaded', function() {
+  const carrinhoLista = document.getElementById('carrinho-lista');
+  const carrinhoTotal = document.getElementById('carrinho-total');
+  const limparCarrinhoButton = document.getElementById('limpar-carrinho');
 
-  // Outras validações necessárias...
+  const adicionarAoCarrinho = function(event) {
+    const nome = event.target.dataset.nome;
+    const preco = parseFloat(event.target.dataset.preco);
 
-  // Envie o pedido ou salve-o em algum lugar
-  alert('Pedido enviado com sucesso!');
-  formPedido.reset();
-});
+    const itemCarrinho = document.createElement('li');
+    itemCarrinho.innerHTML = `${nome} - R$ ${preco.toFixed(2)}`;
+    carrinhoLista.appendChild(itemCarrinho);
 
-// Cálculo de preços
-var buttonsAdicionarCarrinho = document.getElementsByClassName('adicionar-carrinho');
-var carrinho = [];
+    const precosItens = Array.from(carrinhoLista.querySelectorAll('li')).map(function(item) {
+      return parseFloat(item.textContent.split('R$ ')[1]);
+    });
 
-Array.from(buttonsAdicionarCarrinho).forEach(function(button) {
-  button.addEventListener('click', function() {
-    var nome = button.getAttribute('data-nome');
-    var preco = parseFloat(button.getAttribute('data-preco'));
+    const total = precosItens.reduce(function(acc, preco) {
+      return acc + preco;
+    }, 0);
 
-    carrinho.push({ nome: nome, preco: preco });
-    alert('Pastel "' + nome + '" adicionado ao carrinho!');
-    atualizarCarrinho();
-  });
-});
+    carrinhoTotal.textContent = `Total: R$ ${total.toFixed(2)}`;
+  };
 
-function atualizarCarrinho() {
-  var total = 0;
-  var carrinhoHTML = '';
+  const limparCarrinho = function() {
+    carrinhoLista.innerHTML = '';
+    carrinhoTotal.textContent = 'Total: R$ 0,00';
+  };
 
-  carrinho.forEach(function(item) {
-    total += item.preco;
-    carrinhoHTML += '<li>' + item.nome + ' - R$ ' + item.preco.toFixed(2) + '</li>';
+  const adicionarCarrinhoButtons = document.querySelectorAll('.adicionar-carrinho');
+  adicionarCarrinhoButtons.forEach(function(button) {
+    button.addEventListener('click', adicionarAoCarrinho);
   });
 
-  document.getElementById('carrinho-lista').innerHTML = carrinhoHTML;
-  document.getElementById('carrinho-total').innerHTML = 'Total: R$ ' + total.toFixed(2);
-}
+  limparCarrinhoButton.addEventListener('click', limparCarrinho);
+});
