@@ -67,6 +67,12 @@
     margin-bottom: 20px;
   }
   
+  .menu {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 20px;
+  }
+  
   .menu-item {
     display: flex;
     flex-direction: column;
@@ -119,4 +125,5 @@
     padding: 20px;
     text-align: center;
     color: #fff;
-  }  
+  }
+  
